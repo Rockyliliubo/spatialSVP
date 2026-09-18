@@ -1,0 +1,16 @@
+method,endpoint,scenario,detected,planted,rate,lower,upper
+SPARK-X / ACAT,absolute,coherent weak,300,300,1.0,1.0,1.0
+SPARK-X / fgsea,competitive,coherent weak,0,300,0.0,0.0,0.0
+STpathway dCov,absolute,coherent weak,300,300,1.0,1.0,1.0
+spatialSVP matched (total),competitive,coherent weak,300,300,1.0,1.0,1.0
+spatialSVP matched (10 PC),competitive,coherent weak,297,300,0.99,0.976666666666667,1.0
+SPARK-X / ACAT,absolute,coherent strong,299,300,0.996666666666667,0.99,1.0
+SPARK-X / fgsea,competitive,coherent strong,165,300,0.55,0.52,0.58
+STpathway dCov,absolute,coherent strong,300,300,1.0,1.0,1.0
+spatialSVP matched (total),competitive,coherent strong,300,300,1.0,1.0,1.0
+spatialSVP matched (10 PC),competitive,coherent strong,29,300,0.0966666666666667,0.06,0.136666666666667
+SPARK-X / ACAT,absolute,opposing members,300,300,1.0,1.0,1.0
+SPARK-X / fgsea,competitive,opposing members,93,300,0.31,0.293333333333333,0.326666666666667
+STpathway dCov,absolute,opposing members,300,300,1.0,1.0,1.0
+spatialSVP matched (total),competitive,opposing members,1,300,0.0033333333333333,0.0,0.01
+spatialSVP matched (10 PC),competitive,opposing members,218,300,0.726666666666667,0.683333333333333,0.766666666666667

@@ -1,0 +1,8 @@
+method,endpoint,tier,rejections,replicates,rate,lower,upper
+SPARK-X / ACAT,absolute,external,2,100,0.02,0.0055019675501623,0.0700117907285439
+SPARK-X / fgsea,competitive,external,5,100,0.05,0.021543679154368,0.111750469231919
+STpathway dCov,absolute,external,5,100,0.05,0.021543679154368,0.111750469231919
+spatialSVP matched (total),competitive,total,2,100,0.02,0.0055019675501623,0.0700117907285439
+spatialSVP matched (10 PC),competitive,10 PC,1,100,0.01,0.0017674320641406,0.0544861961787053
+spatialSVP permutation (total),absolute,total,5,100,0.05,0.021543679154368,0.111750469231919
+spatialSVP permutation (10 PC),absolute,10 PC,1,100,0.01,0.0017674320641406,0.0544861961787053

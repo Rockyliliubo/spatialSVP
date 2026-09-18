@@ -1,0 +1,8 @@
+"method","endpoint","n_BH_lt_0_05","n_pathways"
+"SPARKX_ACAT","absolute",50,50
+"STpathway_dCov","absolute",50,50
+"spatialSVP_permutation_none","absolute_score",50,50
+"spatialSVP_permutation_pcs","absolute_score",36,50
+"SPARKX_fgsea","competitive_gene_evidence",25,50
+"spatialSVP_matched_none","competitive_score",7,50
+"spatialSVP_matched_pcs","competitive_score",19,50

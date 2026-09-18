@@ -1,0 +1,4 @@
+"residualize","n_hallmark","n_matched","sig_hallmark_wy","sig_matched_wy","wilcox_p_greater","auc_hallmark_vs_matched"
+"none",50,100,50,100,0.213204029914232,0.54
+"libsize",50,100,47,85,1.12878457036549e-07,0.7598
+"pcs",50,100,19,4,6.77022131234096e-09,0.785

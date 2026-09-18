@@ -1,0 +1,8 @@
+method,endpoint,called
+SPARK-X / ACAT,absolute,50
+STpathway dCov,absolute,50
+spatialSVP permutation (total),absolute,50
+spatialSVP permutation (10 PC),absolute,36
+SPARK-X / fgsea,competitive,25
+spatialSVP matched (total),competitive,7
+spatialSVP matched (10 PC),competitive,19

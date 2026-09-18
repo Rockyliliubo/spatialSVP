@@ -1,0 +1,8 @@
+^analysis/
+^figures/
+^\.git$
+^.*\.Rproj$
+^\.Rproj\.user$
+^\.Rhistory$
+^.*\.tar\.gz$
+Rplots\.pdf$

@@ -1,0 +1,34 @@
+Package: spatialSVP
+Type: Package
+Title: Spatially Variable Pathway Activity in Spatial Transcriptomics
+Version: 0.3.0
+Authors@R: person(given = "Liubo", family = "Li", role = c("aut",
+        "cre"), email = "liliubo@189.cn", comment = c(ORCID =
+        "0000-0002-7325-0102"))
+Description: Tests whether pathway activity estimates vary spatially
+        across tissue sections, bridging the gap between pathway
+        activity scoring tools and gene-level spatial variability
+        tests. Activity can be computed from gene sets with several
+        back ends (mean z-score aggregation, decoupleR mlm/wmean,
+        fgsea, GSVA), optionally after regressing out library size and
+        top expression principal components, then tested for spatial
+        variability with statistics inspired by Moran's I, SPARK-X
+        covariance kernels, and SpatialDE Gaussian-process models, the
+        latter providing pathway-level length scales. Significance can
+        be assessed against an absolute null (shared-permutation
+        Westfall-Young maxT correction, respecting the correlation of
+        pathway scores from a shared expression matrix) or a relative
+        null comparing each pathway with size- and expression-matched
+        random gene sets. Block-aware kernels and permutations support
+        multi-section or multi-patient designs. Inputs can be plain
+        matrices, SpatialExperiment, or Seurat objects.
+License: MIT + file LICENSE
+Encoding: UTF-8
+RoxygenNote: 7.3.2
+Depends: R (>= 4.3)
+Imports: ggplot2, Matrix, stats, utils
+Suggests: GSVA, RSpectra, Seurat, SeuratObject, SingleCellExperiment,
+        SpatialExperiment, SummarizedExperiment, decoupleR, fgsea, knitr,
+        msigdbr, rmarkdown, testthat (>= 3.0.0)
+Config/testthat/edition: 3
+VignetteBuilder: knitr

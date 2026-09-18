@@ -1,0 +1,215 @@
+---
+title: "Getting started with spatialSVP"
+author: "Liubo Li"
+output:
+  rmarkdown::html_vignette:
+    toc: true
+vignette: >
+  %\VignetteIndexEntry{Getting started with spatialSVP}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE, comment = "#>", fig.width = 6, fig.height = 5
+)
+```
+
+```{r setup}
+library(spatialSVP)
+```
+
+## The idea
+
+Tools such as decoupleR score pathway activity per spot, and tools such as
+SpatialDE, SPARK-X, or nnSVG test *genes* for spatial variability. The gap
+between the two — *inference on pathway activity maps* — is what spatialSVP
+fills. There are two null hypotheses, and
+the package is explicit about both:
+
+1. **Absolute null**: "this score vector has no spatial structure at all."
+   `test_spatial_variability()` and `permutation_fdr()` answer it with
+   shared, block-aware coordinate permutations (three statistic back ends:
+   Moran's I, multi-scale covariance, and a Gaussian-process LRT that
+   reports a pathway-level *length scale*). On structured tissue this null can
+   be false for many ordinary gene aggregates.
+2. **Relative (matched) null**: "is this pathway *more* spatially organized
+   than random gene sets of the same size and expression level?"
+   `matched_null()` + `matched_enrichment()` answer it empirically, without
+   coordinate permutations. This is the package's competitive test.
+
+## Simulated data
+
+`simulate_svp_data()` creates spots on a jittered grid where a chosen number
+of gene sets carry a spatial signal (Gaussian bump or linear gradient) and
+the rest are spatially null:
+
+```{r sim}
+sim <- simulate_svp_data(n_spots = 400, n_genes = 160, n_sets = 12,
+                         n_spatial_sets = 4, set_size = 10,
+                         pattern = "mix", seed = 42)
+sim$truth
+```
+
+## Score pathway activity
+
+```{r score}
+act <- compute_pathway_activity(sim$counts, sim$gene_sets,
+                                coords = sim$coords,
+                                method = "mean_z",
+                                preprocess = "none")
+act
+```
+
+Any tidy `source/target/mor` network, a named list of gene sets, or a
+genes x sets weight matrix works; `decoupler_mlm`, `decoupler_wmean`,
+`fgsea`, and `gsva` are alternative scoring back ends. Inputs can also be
+`SpatialExperiment` or `Seurat` objects.
+
+## The relative null: matched gene sets
+
+On real tissue, global transcriptomic architecture can make many gene-set
+scores spatially structured. An absolute rejection then establishes coordinate
+association without showing that an annotated pathway is exceptional.
+`matched_null()` draws, for every set, `n_match` random sets of
+the same size whose members match the real members one-to-one within
+expression bins. Scoring them alongside the real sets and comparing spatial
+statistics gives an empirical one-sided p-value per pathway:
+
+```{r matched}
+mn <- matched_null(sim$gene_sets, sim$counts, n_match = 25, seed = 1)
+mn
+act_m <- compute_pathway_activity(sim$counts, mn$network,
+                                  coords = sim$coords,
+                                  method = "mean_z", preprocess = "none")
+enr <- matched_enrichment(act_m, mn, method = "morans_i")
+enr[order(enr$p_matched), c("pathway", "stat", "stat_matched_med",
+                            "p_matched", "p_adj_BH")]
+```
+
+The four planted sets separate from both their own matched replicates
+(`stat` vs `stat_matched_med`) and the spatially null sets. With
+`n_match = 25` the smallest achievable p-value is 1/26. Resolution rule of
+thumb: `n_match >= ~20 * P` is sufficient for a single minimum p-value to
+cross a 5% BH threshold (e.g. 50 pathways -> `n_match = 1999`). Fewer
+references can suffice when several hypotheses share small p-values; small
+`n_match` is mainly useful for screening and ranking.
+
+## Test spatial variability (absolute null)
+
+```{r test-morans}
+res_morans <- test_spatial_variability(act, method = "morans_i",
+                                       n_perm = 99, seed = 1)
+res_morans[order(res_morans$p_value), c("pathway", "stat", "p_value",
+                                        "p_adj_BH")]
+```
+
+All four planted sets rise to the top. The covariance back end additionally
+reports the dominant kernel scale (a coarse descriptor; sharp scale
+estimates come from the gp back end):
+
+```{r test-cov}
+res_cov <- test_spatial_variability(act, method = "covariance",
+                                    n_perm = 99, seed = 1)
+res_cov[order(res_cov$p_value), c("pathway", "stat", "p_value",
+                                  "dominant_scale")]
+```
+
+The Gaussian-process back end reports a per-pathway length scale (in the
+units of the coordinates) and the fraction of variance that is spatial.
+p-values are permutation-based (`n_perm = 199` by default; use that or more
+in practice — the analytic p-value is retained only as an explicit
+diagnostic via `n_perm = 0`):
+
+```{r test-gp}
+res_gp <- test_spatial_variability(act, method = "gp", n_perm = 99,
+                                   seed = 1)
+res_gp[order(res_gp$p_value), c("pathway", "p_value", "lengthscale",
+                                "spatial_var_fraction")]
+```
+
+Short length scales indicate patchy, local programs; long length scales
+indicate smooth gradients across the section.
+
+## Multiplicity: shared-permutation Westfall-Young
+
+Pathway scores share genes and therefore correlate strongly.
+`permutation_fdr()` shuffles spot labels once per replicate *for all
+pathways jointly*, preserving that correlation inside the null, and returns
+single-step maxT adjusted p-values:
+
+```{r wy}
+fdr <- permutation_fdr(act, method = "morans_i", n_perm = 199, seed = 1)
+fdr[order(fdr$p_perm), c("pathway", "stat", "p_perm", "p_adj_BH",
+                         "p_adj_wy")]
+```
+
+Westfall-Young adjusted p-values dominate the raw permutation p-values by
+construction and stay valid under the correlation structure where plain BH
+assumptions are shaky. For sharper resolution than the `1/(n_perm+1)`
+floor, increase `n_perm` (e.g. 999 on real data).
+
+## Residualization tiers
+
+Under library-size normalization, spatially over-expressed genes claim a
+larger share of affected spots' libraries, so unrelated gene sets can
+inherit coherent spatial structure (a compositional coupling, not a testing
+artifact). `compute_pathway_activity()` offers three tiers:
+`residualize = "none"` (default), `"libsize"` (regress each gene's log-CPM
+on log10 library size), and `"pcs"` (additionally regress out the top
+`n_pcs` expression principal components):
+
+```{r resid}
+act_pcs <- compute_pathway_activity(sim$counts, sim$gene_sets,
+                                    coords = sim$coords,
+                                    method = "mean_z",
+                                    residualize = "pcs", n_pcs = 5)
+res_pcs <- test_spatial_variability(act_pcs, method = "morans_i",
+                                    n_perm = 99, seed = 1)
+res_pcs[order(res_pcs$p_value), c("pathway", "stat", "p_value")]
+```
+
+The tiers define different estimands. Principal-component regression can remove
+a coherent biological pattern when that pattern enters the leading components.
+Report total and residual organization separately rather than selecting a tier
+from its p-value.
+
+## Visualize
+
+```{r plots, fig.width = 7, fig.height = 5}
+plot_pathway_spatial(act, "SPATIAL_1")
+```
+
+```{r volcano}
+plot_volcano(enr, p_col = "p_matched", fdr_col = "p_adj_BH")
+```
+
+```{r lmap}
+plot_lengthscale_map(res_gp)
+```
+
+## Multi-section / multi-patient designs
+
+Pass `block` (one value per spot, e.g. section or patient id) to
+`compute_pathway_activity()`; kernels become block-diagonal and all
+permutations shuffle spots only within blocks, avoiding pseudoreplication
+when several sections share a coordinate system:
+
+```{r block}
+sim_b <- simulate_svp_data(n_spots = 400, n_genes = 160, n_sets = 10,
+                           n_spatial_sets = 3, set_size = 10,
+                           n_blocks = 2, seed = 7)
+act_b <- compute_pathway_activity(sim_b$counts, sim_b$gene_sets,
+                                  coords = sim_b$coords, block = sim_b$block,
+                                  method = "mean_z", preprocess = "none")
+res_b <- test_spatial_variability(act_b, method = "morans_i",
+                                  n_perm = 99, seed = 1)
+res_b[order(res_b$p_value), c("pathway", "stat", "p_value", "p_adj_BH")]
+```
+
+## Session info
+
+```{r session}
+sessionInfo()
+```

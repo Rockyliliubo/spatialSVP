@@ -1,0 +1,4 @@
+"sample","donor","tier","spots","genes","hallmark_sets","random_sets","absolute_hallmark_WY","absolute_random_WY","relative_hallmark_BH"
+"151507","Br5292","none",4218,14261,50,100,50,100,0
+"151507","Br5292","libsize",4218,14261,50,100,36,35,29
+"151507","Br5292","pcs",4218,14261,50,100,5,0,6

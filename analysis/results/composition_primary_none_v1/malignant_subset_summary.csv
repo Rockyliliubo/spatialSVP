@@ -1,0 +1,10 @@
+"analysis","section_id","pathways","calls"
+"label_malignant_subset","GSM8452847_Pt-1A",50,7
+"label_malignant_subset","GSM8452865_Pt-6C",50,2
+"label_malignant_subset","GSM8452893_Pt-13C",50,8
+"label_malignant_subset","GSM8641021_C1_D8_ROI1_s1",50,25
+"label_malignant_subset","GSM8641030_C2_D11_ROI1_s1",50,30
+"label_malignant_subset","GSM8641067_C3_D12_ROI1_s1",50,0
+"RCTD_malignant_subset","GSM8452847_Pt-1A",50,10
+"RCTD_malignant_subset","GSM8452865_Pt-6C",50,2
+"RCTD_malignant_subset","GSM8452893_Pt-13C",50,4
