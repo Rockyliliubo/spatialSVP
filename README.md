@@ -44,9 +44,9 @@ residualization switch (`none / libsize / pcs`) complete the workflow.
 ## Installation
 
 ```r
-# from a local checkout
+# from GitHub
 install.packages("remotes")
-remotes::install_local("spatialSVP")
+remotes::install_github("Rockyliliubo/spatialSVP")
 ```
 
 Requires R >= 4.3. Suggested packages enable extra back ends: `decoupleR`,
@@ -148,3 +148,13 @@ block-diagonal while permutations shuffle spots only within blocks.
 ## License
 
 MIT (c) 2026 Liubo Li.
+
+## Citation
+
+If you use spatialSVP, cite the archived software release:
+
+Li L. spatialSVP 0.3.0: matched-null testing for spatially variable pathway
+activity. Zenodo. 2026. https://doi.org/10.5281/zenodo.22831113
+
+The project repository is https://github.com/Rockyliliubo/spatialSVP. The
+concept DOI for all versions is https://doi.org/10.5281/zenodo.22831112.

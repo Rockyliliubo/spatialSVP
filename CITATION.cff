@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use spatialSVP, please cite the archived software release."
+title: "spatialSVP: matched-null testing for spatially variable pathway activity"
+type: software
+version: 0.3.0
+date-released: 2026-09-18
+authors:
+  - family-names: Li
+    given-names: Liubo
+    orcid: "https://orcid.org/0000-0002-7325-0102"
+    affiliation: "Yueyang Hospital of Integrated Traditional Chinese and Western Medicine, Shanghai University of Traditional Chinese Medicine"
+repository-code: "https://github.com/Rockyliliubo/spatialSVP"
+doi: "10.5281/zenodo.22831113"
+license: MIT
+keywords:
+  - spatial transcriptomics
+  - pathway activity
+  - spatial variability
+  - matched null
